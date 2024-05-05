@@ -5,20 +5,19 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 @Entity(tableName = "Olympiad")
 public class Olympiad {
-    // Variables
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     private int id;
-    // Main
     @ColumnInfo(name = "name")
     private String name;
     @ColumnInfo(name = "subject")
     private String subject;
     @ColumnInfo(name = "gradeRange")
     private String gradeRange;
-    // About
     @ColumnInfo(name = "bvi")
     private Boolean bvi;
     @ColumnInfo(name = "rsoshLevel")
@@ -29,14 +28,14 @@ public class Olympiad {
     @Ignore
     public Olympiad () {}
 
-    public Olympiad(String name, String subject, String gradeRange, Boolean bvi, int rsoshLevel, String url) {
+    public Olympiad(int id, String name, String subject, String gradeRange, Boolean bvi, int rsoshLevel, String url) {
+        this.id = id;
         this.name = name;
         this.subject = subject;
         this.gradeRange = gradeRange;
         this.bvi = bvi;
         this.rsoshLevel = rsoshLevel;
         this.url = url;
-        this.id = 0;
     }
 
     // Getters
@@ -54,7 +53,17 @@ public class Olympiad {
 
     public String getUrl() { return url; }
 
-    // Setters
 
-    public void setId(int id) { this.id = id; }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Olympiad olympiad = (Olympiad) o;
+        return id == olympiad.id && rsoshLevel == olympiad.rsoshLevel && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(bvi, olympiad.bvi) && Objects.equals(url, olympiad.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, subject, gradeRange, bvi, rsoshLevel, url);
+    }
 }

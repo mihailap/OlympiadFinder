@@ -43,6 +43,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_subject"
+            android:paddingBottom="4dp"
             tools:text="Grades" />
 
 

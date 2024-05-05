@@ -1,4 +1,5 @@
 package com.mihailap.olympiadfinder.ui;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,18 @@ import com.mihailap.olympiadfinder.databinding.ListItemBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.OlympiadViewHolder>{
-
-
+public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.OlympiadViewHolder> {
     private List<Olympiad> olympiadList = new ArrayList<>();
+
+    public void setOlympiadList(List<Olympiad> olympiadList) {
+        this.olympiadList = olympiadList;
+        notifyDataSetChanged();
+    }
+
+    public List<Olympiad> getOlympiadListList() {
+        return olympiadList;
+    }
+
     @NonNull
     @Override
     public OlympiadViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,14 +47,12 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
         return olympiadList.size();
     }
 
-    static  class OlympiadViewHolder extends RecyclerView.ViewHolder {
-ListItemBinding binding;
+    static class OlympiadViewHolder extends RecyclerView.ViewHolder {
+        private final ListItemBinding binding;
 
         public OlympiadViewHolder(ListItemBinding b) {
             super(b.getRoot());
             binding = b;
         }
     }
-
-
 }

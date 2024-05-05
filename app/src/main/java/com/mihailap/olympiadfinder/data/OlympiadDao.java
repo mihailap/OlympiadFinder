@@ -2,33 +2,28 @@ package com.mihailap.olympiadfinder.data;
 
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
 
 @Dao
 public interface OlympiadDao {
-    @Insert
-    void addOlympiad(Olympiad olympiad);
-
-    @Update
-    void updateOlympiad(Olympiad olympiad);
-
-    @Delete
-    void deleteOlympiad(Olympiad olympiad);
-
-    @Query("select * from olympiad")
-    List<Olympiad> getAllOlympiad();
-
-    @Query("select * from olympiad where id==:id")
-    Olympiad getOlympiad(int id);
+    @Query("SELECT * FROM olympiad ORDER BY id")
+    Single<List<Olympiad>> getOlympiads();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable add(Olympiad olympiad);
+    Completable insertOlympiad(Olympiad olympiad);
+
+    @Query("DELETE FROM olympiad WHERE id =:id")
+    Completable remove(int id);
+
+    @Query("DELETE FROM olympiad")
+    Completable removeAll();
+
+
 }
