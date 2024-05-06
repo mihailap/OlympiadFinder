@@ -40,7 +40,27 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
         holder.binding.tvName.setText(olympiad.getName());
         holder.binding.tvSubject.setText(olympiad.getSubject());
         holder.binding.tvGrade.setText(olympiad.getGradeRange());
+
+        holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onOlympiadClickListener != null) {
+                    onOlympiadClickListener.onOlympiadClick(olympiad);
+                }
+            }
+        });
     }
+
+    private OnOlympiadClickListener onOlympiadClickListener;
+
+    public void setOnOlympiadClickListener(OnOlympiadClickListener onOlympiadClickListener) {
+        this.onOlympiadClickListener = onOlympiadClickListener;
+    }
+
+    interface OnOlympiadClickListener {
+        void onOlympiadClick(Olympiad olympiad);
+    }
+
 
     @Override
     public int getItemCount() {

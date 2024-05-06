@@ -5,10 +5,11 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(tableName = "Olympiad")
-public class Olympiad {
+public class Olympiad implements Serializable {
     @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -26,7 +27,8 @@ public class Olympiad {
     private String url;
 
     @Ignore
-    public Olympiad () {}
+    public Olympiad() {
+    }
 
     public Olympiad(int id, String name, String subject, String gradeRange, Boolean bvi, int rsoshLevel, String url) {
         this.id = id;
@@ -39,19 +41,33 @@ public class Olympiad {
     }
 
     // Getters
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getSubject() { return subject; }
+    public String getSubject() {
+        return subject;
+    }
 
-    public String getGradeRange() { return gradeRange; }
+    public String getGradeRange() {
+        return gradeRange;
+    }
 
-    public Boolean getBvi() { return bvi; }
+    public Boolean getBvi() {
+        return bvi;
+    }
 
-    public int getRsoshLevel() { return rsoshLevel; }
+    public int getRsoshLevel() {
+        return rsoshLevel;
+    }
 
-    public String getUrl() { return url; }
+    public String getUrl() {
+        return url;
+    }
 
 
     @Override

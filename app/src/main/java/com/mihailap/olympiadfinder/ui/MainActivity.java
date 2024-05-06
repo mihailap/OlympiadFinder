@@ -1,7 +1,7 @@
 package com.mihailap.olympiadfinder.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,12 +56,19 @@ public class MainActivity extends AppCompatActivity {
         viewModel.saveOlympiad(NTO);
         viewModel.saveOlympiad(VSOSH);
         viewModel.saveOlympiad(aaa);
-        Log.d("MainTEST", "LOADED");
 
         // RECYCLER VIEW
         olympiadAdapter = new OlympiadAdapter();
 
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+
+        olympiadAdapter.setOnOlympiadClickListener(new OlympiadAdapter.OnOlympiadClickListener() {
+            @Override
+            public void onOlympiadClick(Olympiad olympiad) {
+                Intent intent = OlympiadInfoActivity.newIntent(MainActivity.this, olympiad);
+                startActivity(intent);
+            }
+        });
 
         viewModel.getOlympiads().observe(this, new Observer<List<Olympiad>>() {
             @Override
@@ -71,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.recyclerView.setAdapter(olympiadAdapter);
+
+
         viewModel.refreshList();
     }
 }
