@@ -18,12 +18,8 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
     private List<Olympiad> olympiadList = new ArrayList<>();
 
     public void setOlympiadList(List<Olympiad> olympiadList) {
-        this.olympiadList = olympiadList;
+        this.olympiadList = new ArrayList<>(olympiadList);
         notifyDataSetChanged();
-    }
-
-    public List<Olympiad> getOlympiadListList() {
-        return olympiadList;
     }
 
     @NonNull

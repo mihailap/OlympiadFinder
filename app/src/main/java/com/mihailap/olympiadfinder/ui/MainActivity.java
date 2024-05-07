@@ -2,6 +2,9 @@ package com.mihailap.olympiadfinder.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,10 +15,12 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.mihailap.olympiadfinder.R;
 import com.mihailap.olympiadfinder.data.Olympiad;
 import com.mihailap.olympiadfinder.data.OlympiadDatabase;
 import com.mihailap.olympiadfinder.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
     private OlympiadAdapter olympiadAdapter;
+    private List<Olympiad> tempList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +63,13 @@ public class MainActivity extends AppCompatActivity {
         viewModel.saveOlympiad(VSOSH);
         viewModel.saveOlympiad(aaa);
 
-        // RECYCLER VIEW
+        buildRecycler();
+        viewModel.refreshList();
+    }
+
+    private void buildRecycler() {
         olympiadAdapter = new OlympiadAdapter();
-
         binding.recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-
         olympiadAdapter.setOnOlympiadClickListener(new OlympiadAdapter.OnOlympiadClickListener() {
             @Override
             public void onOlympiadClick(Olympiad olympiad) {
@@ -69,17 +77,48 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         viewModel.getOlympiads().observe(this, new Observer<List<Olympiad>>() {
             @Override
             public void onChanged(List<Olympiad> olympiads) {
                 olympiadAdapter.setOlympiadList(olympiads);
+                tempList = olympiads;
             }
         });
-
         binding.recyclerView.setAdapter(olympiadAdapter);
+        setSupportActionBar(binding.toolbar);
+    }
+
+    // SearchBar
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        binding.searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return false;
+            }
+        });
+        return true;
+    }
 
 
-        viewModel.refreshList();
+    private void filter(String text) {
+        ArrayList<Olympiad> filteredList = new ArrayList<>();
+        for (Olympiad item : tempList) {
+            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        if (filteredList.isEmpty()) {
+            Toast.makeText(this, "Nothing Found...", Toast.LENGTH_SHORT).show();
+        }
+        olympiadAdapter.setOlympiadList(filteredList);
     }
 }

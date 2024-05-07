@@ -47,7 +47,6 @@ public class MainViewModel extends AndroidViewModel {
                     }
                 });
         compositeDisposable.add(disposable);
-
     }
 
     public void saveOlympiad(Olympiad olympiad) {
