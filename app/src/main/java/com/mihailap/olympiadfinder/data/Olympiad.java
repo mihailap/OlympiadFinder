@@ -19,25 +19,31 @@ public class Olympiad implements Serializable {
     private String subject;
     @ColumnInfo(name = "gradeRange")
     private String gradeRange;
-    @ColumnInfo(name = "bvi")
-    private Boolean bvi;
-    @ColumnInfo(name = "rsoshLevel")
-    private int rsoshLevel;
+    @ColumnInfo(name = "stages")
+    private String stages;
+    @ColumnInfo(name = "dates")
+    private String dates;
     @ColumnInfo(name = "url")
     private String url;
+    @ColumnInfo(name = "description")
+    private String description;
+    @ColumnInfo(name = "keywords")
+    private String keywords;
 
     @Ignore
     public Olympiad() {
     }
 
-    public Olympiad(int id, String name, String subject, String gradeRange, Boolean bvi, int rsoshLevel, String url) {
+    public Olympiad(int id, String name, String subject, String gradeRange, String stages, String dates, String url, String description, String keywords) {
         this.id = id;
         this.name = name;
         this.subject = subject;
         this.gradeRange = gradeRange;
-        this.bvi = bvi;
-        this.rsoshLevel = rsoshLevel;
+        this.stages = stages;
+        this.dates = dates;
         this.url = url;
+        this.description = description;
+        this.keywords = keywords;
     }
 
     // Getters
@@ -57,29 +63,51 @@ public class Olympiad implements Serializable {
         return gradeRange;
     }
 
-    public Boolean getBvi() {
-        return bvi;
-    }
-
-    public int getRsoshLevel() {
-        return rsoshLevel;
-    }
-
     public String getUrl() {
         return url;
     }
 
+    public String getStages() {
+        return stages;
+    }
+
+    public String getDates() {
+        return dates;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    @Override
+    public String toString() {
+        return "Olympiad{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", subject='" + subject + '\'' +
+                ", gradeRange='" + gradeRange + '\'' +
+                ", stages=" + stages +
+                ", dates=" + dates +
+                ", url='" + url + '\'' +
+                ", description='" + description + '\'' +
+                ", keywords='" + keywords + '\'' +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Olympiad olympiad = (Olympiad) o;
-        return id == olympiad.id && rsoshLevel == olympiad.rsoshLevel && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(bvi, olympiad.bvi) && Objects.equals(url, olympiad.url);
+        return id == olympiad.id && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(stages, olympiad.stages) && Objects.equals(dates, olympiad.dates) && Objects.equals(url, olympiad.url) && Objects.equals(description, olympiad.description) && Objects.equals(keywords, olympiad.keywords);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, subject, gradeRange, bvi, rsoshLevel, url);
+        return Objects.hash(id, name, subject, gradeRange, stages, dates, url, description, keywords);
     }
 }

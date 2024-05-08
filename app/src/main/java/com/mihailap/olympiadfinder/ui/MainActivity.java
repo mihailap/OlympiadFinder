@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    private OlympiadDatabase olympiadDB;
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
     private OlympiadAdapter olympiadAdapter;
@@ -38,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        buildDB();
+        buildRecycler();
+
+        viewModel.parseOlympiads();
+        setSupportActionBar(binding.toolbar);
+    }
+
+    private void buildDB() {
         RoomDatabase.Callback myCallback = new RoomDatabase.Callback() {
             @Override
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -50,21 +56,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        olympiadDB = Room.databaseBuilder(getApplicationContext(), OlympiadDatabase.class, "OlympiadDB")
+        OlympiadDatabase olympiadDB = Room.databaseBuilder(getApplicationContext(), OlympiadDatabase.class, "OlympiadDB")
                 .addCallback(myCallback).build();
-
-        // Adding elements TODO: remake this somehow
-        // i think this causes memory leaks!
-
-        Olympiad NTO = new Olympiad(1, "NTO", "Phys", "8-11", false, 3, "example.com");
-        Olympiad VSOSH = new Olympiad(2, "VSOSH", "Every", "4-11", false, 1, "example.org");
-        Olympiad aaa = new Olympiad(3, "Test", "Yes", "4", false, 1, "example.org");
-        viewModel.saveOlympiad(NTO);
-        viewModel.saveOlympiad(VSOSH);
-        viewModel.saveOlympiad(aaa);
-
-        buildRecycler();
-        viewModel.refreshList();
     }
 
     private void buildRecycler() {
@@ -85,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         binding.recyclerView.setAdapter(olympiadAdapter);
-        setSupportActionBar(binding.toolbar);
     }
 
     // SearchBar
@@ -99,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 filter(newText);
@@ -108,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    // Filter for searchbar
     private void filter(String text) {
         ArrayList<Olympiad> filteredList = new ArrayList<>();
         for (Olympiad item : tempList) {
-            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+            if (item.getKeywords().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
             }
         }

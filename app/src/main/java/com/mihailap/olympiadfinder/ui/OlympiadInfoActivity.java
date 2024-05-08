@@ -13,6 +13,7 @@ import com.mihailap.olympiadfinder.data.Olympiad;
 import com.mihailap.olympiadfinder.databinding.ActivityOlympiadInfoBinding;
 
 public class OlympiadInfoActivity extends AppCompatActivity {
+    // TODO: FULLY REMAKE THIS
     private ActivityOlympiadInfoBinding binding;
     private static final String EXTRA_OLYMPIAD = "olympiad";
 
@@ -28,12 +29,12 @@ public class OlympiadInfoActivity extends AppCompatActivity {
             binding.tvName.setText(olympiad.getName());
             binding.tvSubject.setText(olympiad.getSubject());
             binding.tvGrade.setText(olympiad.getGradeRange());
-            if (olympiad.getBvi()) {
-                binding.tvBvi.setText("Yes");
-            } else {
-                binding.tvBvi.setText("No");
-            }
-            binding.tvRsosh.setText(String.valueOf(olympiad.getRsoshLevel()));
+//            if (olympiad.getBvi()) {
+//                binding.tvBvi.setText("Yes");
+//            } else {
+//                binding.tvBvi.setText("No");
+//            }
+//            binding.tvRsosh.setText(String.valueOf(olympiad.getRsoshLevel()));
         } catch (Exception e) {
             Log.d("OLYMPIAD_INF", "Something went wrong!");
         }
@@ -44,7 +45,7 @@ public class OlympiadInfoActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                intent.setData(Uri.parse("http://" + olympiad.getUrl()));
+                intent.setData(Uri.parse(olympiad.getUrl()));
                 startActivity(intent);
             }
         });

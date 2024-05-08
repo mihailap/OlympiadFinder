@@ -24,6 +24,4 @@ public interface OlympiadDao {
 
     @Query("DELETE FROM olympiad")
     Completable removeAll();
-
-
 }

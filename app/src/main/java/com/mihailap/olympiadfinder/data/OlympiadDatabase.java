@@ -6,9 +6,9 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Olympiad.class}, version = 1)
+@Database(entities = {Olympiad.class}, version = 2)
 public abstract class OlympiadDatabase extends RoomDatabase {
-    private static final String DB_NAME = "database_room.db";
+    private static final String DB_NAME = "OlympiadDB.db";
     private static OlympiadDatabase instance = null;
 
     public static OlympiadDatabase newInstance(Application application) {
@@ -20,4 +20,6 @@ public abstract class OlympiadDatabase extends RoomDatabase {
     }
 
     public abstract OlympiadDao olympiadDao();
+
+
 }
