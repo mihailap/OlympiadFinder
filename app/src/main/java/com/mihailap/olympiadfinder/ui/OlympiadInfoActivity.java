@@ -13,7 +13,6 @@ import com.mihailap.olympiadfinder.data.Olympiad;
 import com.mihailap.olympiadfinder.databinding.ActivityOlympiadInfoBinding;
 
 public class OlympiadInfoActivity extends AppCompatActivity {
-    // TODO: FULLY REMAKE THIS
     private ActivityOlympiadInfoBinding binding;
     private static final String EXTRA_OLYMPIAD = "olympiad";
 
@@ -25,31 +24,94 @@ public class OlympiadInfoActivity extends AppCompatActivity {
 
         Olympiad olympiad = (Olympiad) getIntent().getSerializableExtra(EXTRA_OLYMPIAD);
 
+        setData(olympiad);
+        setListeners(olympiad);
+    }
+
+    public void setData(Olympiad olympiad) {
         try {
             binding.tvName.setText(olympiad.getName());
-            binding.tvSubject.setText(olympiad.getSubject());
-            binding.tvGrade.setText(olympiad.getGradeRange());
-//            if (olympiad.getBvi()) {
-//                binding.tvBvi.setText("Yes");
-//            } else {
-//                binding.tvBvi.setText("No");
-//            }
-//            binding.tvRsosh.setText(String.valueOf(olympiad.getRsoshLevel()));
+
+            if (!olympiad.getDescription().isEmpty()) {
+                binding.tvDescription.setText(olympiad.getDescription());
+            } else {
+                binding.tvDescription.setVisibility(View.GONE);
+            }
+
+            if (!olympiad.getSubject().isEmpty()) {
+                binding.tvSubjects.setText(olympiad.getSubject().replace(" ", ", "));
+            } else {
+                binding.tvSubjects.setVisibility(View.GONE);
+            }
+
+            if (!olympiad.getGradeRange().isEmpty()) {
+                binding.tvGrade.setText(olympiad.getGradeRange());
+            } else {
+                binding.tvGrade.setVisibility(View.GONE);
+            }
+
+            if (!olympiad.getStages().isEmpty() && !olympiad.getDates().isEmpty()) {
+                String[] arr1 = olympiad.getStages().split(",");
+                String[] arr2 = olympiad.getDates().split(",");
+
+                StringBuilder result = new StringBuilder();
+                for (int i = 0; i < arr1.length; i++) {
+                    result.append(arr1[i]).append("\n").append(arr2[i]);
+                    if (i < arr1.length - 1) {
+                        result.append("\n\n");
+                    }
+                }
+                binding.tvStagesDates.setText(result);
+            } else {
+                binding.tvSchedule.setVisibility(View.GONE);
+            }
+
         } catch (Exception e) {
             Log.d("OLYMPIAD_INF", "Something went wrong!");
         }
+    }
 
-        binding.btnWeb.setOnClickListener(new View.OnClickListener() {
+    public void setListeners(Olympiad olympiad) {
+        binding.tvSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleContent();
+            }
+        });
+
+        if (!olympiad.getUrl().isEmpty()){
+            binding.btnWeb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setData(Uri.parse(olympiad.getUrl()));
+                    startActivity(intent);
+                }
+            });
+        } else {
+            binding.btnWeb.setVisibility(View.GONE);
+        }
+
+        binding.btnOlru.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                intent.setData(Uri.parse(olympiad.getUrl()));
+                intent.setData(Uri.parse("https://olimpiada.ru/activity/" + olympiad.getId()));
                 startActivity(intent);
             }
         });
+    }
 
+    public void toggleContent() {
+        if (binding.expandedLayout.getVisibility() == View.VISIBLE) {
+            binding.expandedLayout.setVisibility(View.GONE);
+        } else {
+            binding.expandedLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     public static Intent newIntent(Context context, Olympiad olympiad) {
@@ -57,6 +119,4 @@ public class OlympiadInfoActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_OLYMPIAD, olympiad);
         return intent;
     }
-
-
 }
