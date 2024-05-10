@@ -2,7 +2,6 @@ package com.mihailap.olympiadfinder.ui;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -17,7 +16,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -32,6 +30,8 @@ public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Olympiad>> olympiads = new MutableLiveData<>();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isDataLoaded = false;
+    private final MutableLiveData<Integer> maxProgressLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> currentProgressLiveData = new MutableLiveData<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -40,6 +40,14 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<List<Olympiad>> getOlympiads() {
         return olympiads;
+    }
+
+    public LiveData<Integer> getMaxProgressLiveData() {
+        return maxProgressLiveData;
+    }
+
+    public LiveData<Integer> getCurrentProgressLiveData() {
+        return currentProgressLiveData;
     }
 
 
@@ -76,16 +84,31 @@ public class MainViewModel extends AndroidViewModel {
 
     public void parseOlympiads() {
         if (!isDataLoaded) {
-            Toast.makeText(this.getApplication(), "PARSING", Toast.LENGTH_SHORT).show();
+            Log.d("PARSE", "STARTED PARSING");
+            int firstOlymp = 70;
+            int lastOlymp = 80;
+            maxProgressLiveData.setValue(lastOlymp - firstOlymp - 1);
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i = 70; i < 80; i++) {
+                    for (int i = firstOlymp; i < lastOlymp + 1; i++) {
                         try {
+                            // Loading html page
                             Document document = Jsoup.connect("https://olimpiada.ru/activity/" + i).get();
+                            // Get name
                             String name = document.select("div.top_container > h1").text();
-                            String subject = document.select("div.subject_tags_full > span.subject_tag").text();
+                            // Get subject + replace space with ","
+                            String subject = document.select("div.subject_tags_full > span.subject_tag").text().replace(" ", ", ");
+                            // Get grade
                             String grade = document.select("span.classes_types_a").text();
+                            // Transform range to numbers for search
+                            int dashIndex = grade.indexOf('–');
+                            int start = Integer.parseInt(grade.substring(0, dashIndex));
+                            int end = Integer.parseInt(grade.substring(dashIndex + 1, grade.indexOf(' ', dashIndex)));
+                            StringBuilder gradesList = new StringBuilder();
+                            for (int j = start; j <= end; j++) {
+                                gradesList.append(j).append(" ");
+                            }
                             // Get stages + dates
                             Elements rows = document.select("table.events_for_activity tr.grey");
                             StringBuilder stagesBuilder = new StringBuilder();
@@ -96,11 +119,14 @@ public class MainViewModel extends AndroidViewModel {
                             }
                             String stages = stagesBuilder.toString().replaceAll(",$", "");
                             String dates = datesBuilder.toString().replaceAll(",$", "");
+                            // Get olympiad url
                             String url = document.select("div.contacts > a.color").attr("href");
+                            // Get description
                             String description = document.select("meta[name = description]").attr("content");
+                            // Get keywords
                             String keywords = document.select("meta[name = keywords]").attr("content");
-
-                            Olympiad olympiad = new Olympiad(i, name, subject, grade, stages, dates, url, description, keywords);
+                            // Creating olympiad + adding it to DB
+                            Olympiad olympiad = new Olympiad(i, name, subject, grade, stages, dates, url, description, keywords, gradesList.toString());
 
                             Disposable disposable = database.olympiadDao().insertOlympiad(olympiad)
                                     .subscribeOn(Schedulers.io())
@@ -108,15 +134,16 @@ public class MainViewModel extends AndroidViewModel {
                                     .subscribe(new Action() {
                                         @Override
                                         public void run() throws Throwable {
-                                            Log.d("TEST", "ID = " + olympiad.getId() + " NAME = " + olympiad.getName());
                                         }
                                     });
                             compositeDisposable.add(disposable);
-                            Log.d("PARSE", "PARSED SUCCESSFULLY");
+                            Log.d("PARSE", "PARSED SUCCESSFULLY " + "ID = " + olympiad.getId() + " NAME = " + olympiad.getName());
                             refreshList();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             Log.d("PARSE", "PARSE ERROR: " + e.getMessage());
                         }
+                        currentProgressLiveData.postValue(i - firstOlymp - 1);
+                        Log.d("PROGRESS", String.valueOf(i - firstOlymp - 1));
                     }
 
                 }

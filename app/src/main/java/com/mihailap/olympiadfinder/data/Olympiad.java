@@ -29,12 +29,14 @@ public class Olympiad implements Serializable {
     private String description;
     @ColumnInfo(name = "keywords")
     private String keywords;
+    @ColumnInfo(name = "gradesList")
+    private String gradesList;
 
     @Ignore
     public Olympiad() {
     }
 
-    public Olympiad(int id, String name, String subject, String gradeRange, String stages, String dates, String url, String description, String keywords) {
+    public Olympiad(int id, String name, String subject, String gradeRange, String stages, String dates, String url, String description, String keywords, String gradesList) {
         this.id = id;
         this.name = name;
         this.subject = subject;
@@ -44,6 +46,7 @@ public class Olympiad implements Serializable {
         this.url = url;
         this.description = description;
         this.keywords = keywords;
+        this.gradesList = gradesList;
     }
 
     // Getters
@@ -83,6 +86,10 @@ public class Olympiad implements Serializable {
         return keywords;
     }
 
+    public String getGradesList() {
+        return gradesList;
+    }
+
     @Override
     public String toString() {
         return "Olympiad{" +
@@ -90,11 +97,12 @@ public class Olympiad implements Serializable {
                 ", name='" + name + '\'' +
                 ", subject='" + subject + '\'' +
                 ", gradeRange='" + gradeRange + '\'' +
-                ", stages=" + stages +
-                ", dates=" + dates +
+                ", stages='" + stages + '\'' +
+                ", dates='" + dates + '\'' +
                 ", url='" + url + '\'' +
                 ", description='" + description + '\'' +
                 ", keywords='" + keywords + '\'' +
+                ", gradesList='" + gradesList + '\'' +
                 '}';
     }
 
@@ -103,11 +111,12 @@ public class Olympiad implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Olympiad olympiad = (Olympiad) o;
-        return id == olympiad.id && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(stages, olympiad.stages) && Objects.equals(dates, olympiad.dates) && Objects.equals(url, olympiad.url) && Objects.equals(description, olympiad.description) && Objects.equals(keywords, olympiad.keywords);
+        return id == olympiad.id && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(stages, olympiad.stages) && Objects.equals(dates, olympiad.dates) && Objects.equals(url, olympiad.url) && Objects.equals(description, olympiad.description) && Objects.equals(keywords, olympiad.keywords) && Objects.equals(gradesList, olympiad.gradesList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, subject, gradeRange, stages, dates, url, description, keywords);
+        return Objects.hash(id, name, subject, gradeRange, stages, dates, url, description, keywords, gradesList);
     }
+
 }

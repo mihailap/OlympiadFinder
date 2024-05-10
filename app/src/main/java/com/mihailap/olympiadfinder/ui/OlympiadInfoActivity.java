@@ -39,7 +39,7 @@ public class OlympiadInfoActivity extends AppCompatActivity {
             }
 
             if (!olympiad.getSubject().isEmpty()) {
-                binding.tvSubjects.setText(olympiad.getSubject().replace(" ", ", "));
+                binding.tvSubjects.setText(olympiad.getSubject());
             } else {
                 binding.tvSubjects.setVisibility(View.GONE);
             }
@@ -69,6 +69,7 @@ public class OlympiadInfoActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.d("OLYMPIAD_INF", "Something went wrong!");
         }
+
     }
 
     public void setListeners(Olympiad olympiad) {
@@ -79,7 +80,7 @@ public class OlympiadInfoActivity extends AppCompatActivity {
             }
         });
 
-        if (!olympiad.getUrl().isEmpty()){
+        if (!olympiad.getUrl().isEmpty()) {
             binding.btnWeb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
