@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Загрузка данных. Пожалуйста, подождите..."
+        android:text="@string/loading_data"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,6 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:clickable="true"
+            android:contentDescription="@string/filter_icon"
             android:src="@drawable/baseline_filter_list_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/customSearch"
@@ -94,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="Выберите класс"
+            android:text="@string/pick_grade"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,67 +120,67 @@
                     android:id="@+id/checkbox1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1" />
+                    android:text="@string/_1" />
 
                 <CheckBox
                     android:id="@+id/checkbox2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2" />
+                    android:text="@string/_2" />
 
                 <CheckBox
                     android:id="@+id/checkbox3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3" />
+                    android:text="@string/_3" />
 
                 <CheckBox
                     android:id="@+id/checkbox4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4" />
+                    android:text="@string/_4" />
 
                 <CheckBox
                     android:id="@+id/checkbox5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5" />
+                    android:text="@string/_5" />
 
                 <CheckBox
                     android:id="@+id/checkbox6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="6" />
+                    android:text="@string/_6" />
 
                 <CheckBox
                     android:id="@+id/checkbox7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="7" />
+                    android:text="@string/_7" />
 
                 <CheckBox
                     android:id="@+id/checkbox8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="8" />
+                    android:text="@string/_8" />
 
                 <CheckBox
                     android:id="@+id/checkbox9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="9" />
+                    android:text="@string/_9" />
 
                 <CheckBox
                     android:id="@+id/checkbox10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10" />
+                    android:text="@string/_10" />
 
                 <CheckBox
                     android:id="@+id/checkbox11"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="11" />
+                    android:text="@string/_11" />
 
             </RadioGroup>
 
@@ -193,7 +194,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="4dp"
-        android:text="Ничего не найдено..."
+        android:text="@string/nothing_found"
         android:textSize="20sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"

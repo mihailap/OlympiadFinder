@@ -85,29 +85,49 @@ public class MainViewModel extends AndroidViewModel {
     public void parseOlympiads() {
         if (!isDataLoaded) {
             Log.d("PARSE", "STARTED PARSING");
-            int firstOlymp = 70;
-            int lastOlymp = 80;
-            maxProgressLiveData.setValue(lastOlymp - firstOlymp - 1);
+            int firstOlympId = 40 ;
+            int lastOlympId = 100;
+            maxProgressLiveData.setValue(lastOlympId - firstOlympId + 1);
+            Log.d("PROGRESS", "MAX PROGRESS:" + (lastOlympId - firstOlympId + 1));
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for (int i = firstOlymp; i < lastOlymp + 1; i++) {
+                    for (int i = firstOlympId; i <= lastOlympId; i++) {
                         try {
                             // Loading html page
                             Document document = Jsoup.connect("https://olimpiada.ru/activity/" + i).get();
                             // Get name
                             String name = document.select("div.top_container > h1").text();
                             // Get subject + replace space with ","
-                            String subject = document.select("div.subject_tags_full > span.subject_tag").text().replace(" ", ", ");
+                            String subject = document.select("div.subject_tags_full > span.subject_tag").text();
+                            String[] subjectsArray = subject.split(" ");
+                            StringBuilder resultBuilder = new StringBuilder();
+                            resultBuilder.append(subjectsArray[0]);
+
+                            for (int j = 1; j < subjectsArray.length; j++) {
+                                if (Character.isLowerCase(subjectsArray[j].charAt(0))) {
+                                    resultBuilder.append(" ");
+                                } else {
+                                    resultBuilder.append(", ");
+                                }
+                                resultBuilder.append(subjectsArray[j]);
+                            }
+                            subject = resultBuilder.toString();
                             // Get grade
                             String grade = document.select("span.classes_types_a").text();
                             // Transform range to numbers for search
-                            int dashIndex = grade.indexOf('–');
-                            int start = Integer.parseInt(grade.substring(0, dashIndex));
-                            int end = Integer.parseInt(grade.substring(dashIndex + 1, grade.indexOf(' ', dashIndex)));
                             StringBuilder gradesList = new StringBuilder();
-                            for (int j = start; j <= end; j++) {
-                                gradesList.append(j).append(" ");
+                            if (grade.contains("–")) {
+                                int dashIndex = grade.indexOf("–");
+                                int start = Integer.parseInt(grade.substring(0, dashIndex));
+                                int end = Integer.parseInt(grade.substring(dashIndex + 1, grade.indexOf(' ', dashIndex)));
+                                for (int j = start; j <= end; j++) {
+                                    gradesList.append(j).append(" ");
+                                }
+                            } else if (!grade.isEmpty()) {
+                                gradesList = new StringBuilder(grade.substring(0, grade.indexOf(" ")));
+                            } else {
+                                gradesList = new StringBuilder();
                             }
                             // Get stages + dates
                             Elements rows = document.select("table.events_for_activity tr.grey");
@@ -142,14 +162,13 @@ public class MainViewModel extends AndroidViewModel {
                         } catch (Exception e) {
                             Log.d("PARSE", "PARSE ERROR: " + e.getMessage());
                         }
-                        currentProgressLiveData.postValue(i - firstOlymp - 1);
-                        Log.d("PROGRESS", String.valueOf(i - firstOlymp - 1));
+                        currentProgressLiveData.postValue(i - firstOlympId + 1);
+                        Log.d("PROGRESS", String.valueOf(i - firstOlympId + 1));
                     }
 
                 }
             });
             thread.start();
-            Log.d("PARSE", "STOPPED PARSING");
             isDataLoaded = true;
         }
     }

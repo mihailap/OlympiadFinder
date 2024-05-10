@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">OlympiadFinder</string>
+    <string name="app_name">Olympiad Finder</string>
+    <string name="loading_data">Загрузка данных. Пожалуйста, подождите...</string>
+    <string name="pick_grade">Выберите класс участия</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_3">3</string>
+    <string name="_4">4</string>
+    <string name="_5">5</string>
+    <string name="_6">6</string>
+    <string name="_7">7</string>
+    <string name="_8">8</string>
+    <string name="_9">9</string>
+    <string name="_10">10</string>
+    <string name="_11">11</string>
+    <string name="nothing_found">Ничего не найдено...</string>
+    <string name="schedule">Расписание</string>
+    <string name="olympiad_web">Сайт олимпиады</string>
+    <string name="olympiada_ru">Страница на Olympiada.ru</string>
+    <string name="search">Search</string>
+    <string name="filter_icon">Filter Icon</string>
 </resources>
