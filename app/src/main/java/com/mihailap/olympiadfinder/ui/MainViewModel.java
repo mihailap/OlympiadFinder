@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -28,6 +29,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MainViewModel extends AndroidViewModel {
     private final OlympiadDatabase database;
     private final MutableLiveData<List<Olympiad>> olympiads = new MutableLiveData<>();
+    private final MutableLiveData<List<Olympiad>> filteredOlympiads = new MutableLiveData<>();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private boolean isDataLoaded = false;
     private final MutableLiveData<Integer> maxProgressLiveData = new MutableLiveData<>();
@@ -41,7 +43,9 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<Olympiad>> getOlympiads() {
         return olympiads;
     }
-
+    public LiveData<List<Olympiad>> getFilteredOlympiads() {
+        return filteredOlympiads;
+    }
     public LiveData<Integer> getMaxProgressLiveData() {
         return maxProgressLiveData;
     }
@@ -86,7 +90,7 @@ public class MainViewModel extends AndroidViewModel {
         if (!isDataLoaded) {
             Log.d("PARSE", "STARTED PARSING");
             int firstOlympId = 40 ;
-            int lastOlympId = 100;
+            int lastOlympId = 80;
             maxProgressLiveData.setValue(lastOlympId - firstOlympId + 1);
             Log.d("PROGRESS", "MAX PROGRESS:" + (lastOlympId - firstOlympId + 1));
             Thread thread = new Thread(new Runnable() {
@@ -173,6 +177,41 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
+    // Methods for filtering
+    public void filter(String text, List<Integer> selectedGrades) {
+        List<Olympiad> filteredList = new ArrayList<>();
+        List<Olympiad> tempList = getOlympiads().getValue();
+        if (tempList != null) {
+            for (Olympiad item : tempList) {
+                if ((item.getKeywords().toLowerCase().contains(text.toLowerCase())
+                        || item.getName().toLowerCase().contains(text.toLowerCase()))
+                        && containsAllGrades(item.getGradesList(), selectedGrades)) {
+                    filteredList.add(item);
+                }
+            }
+        }
+        // Обновляем LiveData с отфильтрованным списком олимпиад
+        filteredOlympiads.setValue(filteredList);
+    }
+
+    private boolean containsAllGrades (String gradesList, List < Integer > selectedGrades){
+        // Splitting grades string to array
+        String[] gradesArray = gradesList.split(" ");
+        for (int grade : selectedGrades) {
+            String gradeString = String.valueOf(grade);
+            boolean found = false;
+            for (String word : gradesArray) {
+                if (word.equals(gradeString)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /*
     public void clearTable(int id) {

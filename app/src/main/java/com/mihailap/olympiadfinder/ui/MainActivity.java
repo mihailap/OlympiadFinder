@@ -24,7 +24,6 @@ import com.mihailap.olympiadfinder.data.OlympiadDatabase;
 import com.mihailap.olympiadfinder.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
     private OlympiadAdapter olympiadAdapter;
-    private List<Olympiad> tempList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel.parseOlympiads();
         setProgressBar();
         setSupportActionBar(binding.toolbar);
-        setFilter();
+        setFilters();
         setUpCheckBoxListeners();
     }
 
@@ -62,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        OlympiadDatabase olympiadDB = Room.databaseBuilder(getApplicationContext(), OlympiadDatabase.class, "OlympiadDB")
-                .addCallback(myCallback).build();
+        OlympiadDatabase olympiadDB = Room.databaseBuilder(getApplicationContext(),
+                OlympiadDatabase.class,
+                "OlympiadDB").addCallback(myCallback).build();
     }
 
     private void buildRecycler() {
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Olympiad> olympiads) {
                 olympiadAdapter.setOlympiadList(olympiads);
-                tempList = olympiads;
             }
         });
         binding.recyclerView.setAdapter(olympiadAdapter);
@@ -99,7 +97,19 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filter(newText);
+                viewModel.filter(newText, getSelectedGrades());
+                // when filtered we need to update screen
+                viewModel.getFilteredOlympiads().observe(MainActivity.this, new Observer<List<Olympiad>>() {
+                    @Override
+                    public void onChanged(List<Olympiad> olympiads) {
+                        if (olympiads.isEmpty()) {
+                            binding.tvNothingFound.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.tvNothingFound.setVisibility(View.GONE);
+                        }
+                        olympiadAdapter.setOlympiadList(olympiads);
+                    }
+                });
                 return false;
             }
         });
@@ -117,86 +127,42 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         // if checkbox selected, filter
-                        filter(binding.searchBar.getQuery().toString());
+                        viewModel.filter(binding.searchBar.getQuery().toString(), getSelectedGrades());
+                        // when filtered we need to update screen
+                        viewModel.getFilteredOlympiads().observe(MainActivity.this, new Observer<List<Olympiad>>() {
+                            @Override
+                            public void onChanged(List<Olympiad> olympiads) {
+                                if (olympiads.isEmpty()) {
+                                    binding.tvNothingFound.setVisibility(View.VISIBLE);
+                                } else {
+                                    binding.tvNothingFound.setVisibility(View.GONE);
+                                }
+                                olympiadAdapter.setOlympiadList(olympiads);
+                            }
+                        });
                     }
                 });
             }
         }
     }
 
-
-    // Filter for searchbar
-    private void filter(String text) {
-        if (tempList != null) {
-
-            RadioGroup radioGroup = binding.checkboxGroup;
-            StringBuilder selectedTextsBuilder = new StringBuilder();
-
-            List<Integer> selectedGrades = new ArrayList<>();
-
-            int childCount = radioGroup.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View view = radioGroup.getChildAt(i);
-                if (view instanceof CheckBox) {
-                    CheckBox checkBox = (CheckBox) view;
-                    if (checkBox.isChecked()) {
-                        String selectedText = checkBox.getText().toString();
-                        selectedTextsBuilder.append(selectedText).append(" ");
-                        int grade = Integer.parseInt(selectedText);
-                        selectedGrades.add(grade);
-                    }
+    private List<Integer> getSelectedGrades() {
+        List<Integer> selectedGrades = new ArrayList<>();
+        for (int i = 0; i < binding.checkboxGroup.getChildCount(); i++) {
+            View view = binding.checkboxGroup.getChildAt(i);
+            if (view instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) view;
+                if (checkBox.isChecked()) {
+                    String selectedText = checkBox.getText().toString();
+                    int grade = Integer.parseInt(selectedText);
+                    selectedGrades.add(grade);
                 }
-            }
-            // Transform "8 10" to "8 9 10" etc
-            if (!selectedGrades.isEmpty()) {
-                int minGrade = Collections.min(selectedGrades);
-                int maxGrade = Collections.max(selectedGrades);
-                for (int i = minGrade + 1; i < maxGrade; i++) {
-                    selectedTextsBuilder.append(i).append(" ");
-                }
-            }
-
-            ArrayList<Olympiad> filteredList = new ArrayList<>();
-            for (Olympiad item : tempList) {
-                if ((item.getKeywords().toLowerCase().contains(text.toLowerCase())
-                        || item.getName().toLowerCase().contains(text.toLowerCase()))
-                        && containsAllGrades(item.getGradesList(), selectedGrades)) {
-                    filteredList.add(item);
-                }
-            }
-
-            if (filteredList.isEmpty()) {
-                binding.tvNothingFound.setVisibility(View.VISIBLE);
-            } else {
-                binding.tvNothingFound.setVisibility(View.GONE);
-            }
-
-            olympiadAdapter.setOlympiadList(filteredList);
-        }
-    }
-
-    // Does grades contains in olympiad
-    private boolean containsAllGrades(String gradesList, List<Integer> selectedGrades) {
-        // Splitting grades string to array
-        String[] gradesArray = gradesList.split(" ");
-        for (int grade : selectedGrades) {
-            String gradeString = String.valueOf(grade);
-            boolean found = false;
-            for (String word : gradesArray) {
-                if (word.equals(gradeString)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return false;
             }
         }
-        return true;
+        return selectedGrades;
     }
 
-
-    private void setFilter() {
+    private void setFilters() {
         binding.filterIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
