@@ -1,11 +1,19 @@
 package com.mihailap.olympiadfinder.ui;
 
+import static android.R.string;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.PopupMenu;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -31,20 +39,35 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
     private OlympiadAdapter olympiadAdapter;
+    private static final String MY_SETTINGS = "my_settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        SharedPreferences sp = getSharedPreferences(MY_SETTINGS,
+                Context.MODE_PRIVATE);
+        // Checking if app is opened first time
+        boolean hasVisited = sp.getBoolean("hasVisited", false);
+
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         buildDB();
         buildRecycler();
-        viewModel.parseOlympiads();
-        setProgressBar();
+        viewModel.refreshList();
         setSupportActionBar(binding.toolbar);
         setFilters();
         setUpCheckBoxListeners();
+
+        if (!hasVisited) {
+            viewModel.parseOlympiads();
+            setProgressBar();
+            SharedPreferences.Editor e = sp.edit();
+            e.putBoolean("hasVisited", true);
+            e.apply();
+        }
+
     }
 
     private void buildDB() {
@@ -174,9 +197,46 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        binding.optionsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(MainActivity.this, binding.optionsIcon);
+
+                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Обновление данных")
+                                .setMessage("Вы точно хотите обновить данные?")
+                                .setPositiveButton(string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        viewModel.parseOlympiads();
+                                        setProgressBar();
+                                        //Toast.makeText(getApplicationContext(), "ОБНОВЛЯЕМ ДАННЫЕ...", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .setNegativeButton(string.no, null)
+                                .show();
+                        return true;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
     }
 
     private void setProgressBar() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.tvDataLoading.setVisibility(View.VISIBLE);
+        binding.customSearch.setVisibility(View.GONE);
+        binding.filtersSelect.setVisibility(View.GONE);
+        binding.searchBar.setQuery("", false);
+        binding.searchBar.setIconified(true);
+        binding.tvNothingFound.setVisibility(View.GONE);
+        clearAllCheckBoxes(binding.checkboxGroup);
         viewModel.getMaxProgressLiveData().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer maxProgress) {
@@ -194,5 +254,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void clearAllCheckBoxes(RadioGroup radioGroup) {
+        int childCount = radioGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = radioGroup.getChildAt(i);
+            if (view instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) view;
+                checkBox.setChecked(false);
+            }
+        }
     }
 }

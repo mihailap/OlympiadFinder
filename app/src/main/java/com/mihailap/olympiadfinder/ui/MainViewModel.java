@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -31,21 +32,31 @@ public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Olympiad>> olympiads = new MutableLiveData<>();
     private final MutableLiveData<List<Olympiad>> filteredOlympiads = new MutableLiveData<>();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private boolean isDataLoaded = false;
     private final MutableLiveData<Integer> maxProgressLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> currentProgressLiveData = new MutableLiveData<>();
+    private final List<String> tech = new ArrayList<>();
+    private final List<String> nature = new ArrayList<>();
+    private final List<String> human = new ArrayList<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         database = OlympiadDatabase.newInstance(application);
+        Collections.addAll(tech, "Информатика", "Физика", "Математика", "Робототехника", "Черчение", "Технология");
+        Collections.addAll(nature, "География", "Астрономия", "Экология", "Химия", "Биология");
+        Collections.addAll(human, "Право", "ОБЖ", "Предпринимательство", "Лингвистика", "Психология", "История",
+                "Экономика", "ИЗО", "Обществознание", "Искусство", "Литература", "язык");
+
     }
+
 
     public LiveData<List<Olympiad>> getOlympiads() {
         return olympiads;
     }
+
     public LiveData<List<Olympiad>> getFilteredOlympiads() {
         return filteredOlympiads;
     }
+
     public LiveData<Integer> getMaxProgressLiveData() {
         return maxProgressLiveData;
     }
@@ -87,94 +98,105 @@ public class MainViewModel extends AndroidViewModel {
     */
 
     public void parseOlympiads() {
-        if (!isDataLoaded) {
-            Log.d("PARSE", "STARTED PARSING");
-            int firstOlympId = 40 ;
-            int lastOlympId = 80;
-            maxProgressLiveData.setValue(lastOlympId - firstOlympId + 1);
-            Log.d("PROGRESS", "MAX PROGRESS:" + (lastOlympId - firstOlympId + 1));
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = firstOlympId; i <= lastOlympId; i++) {
-                        try {
-                            // Loading html page
-                            Document document = Jsoup.connect("https://olimpiada.ru/activity/" + i).get();
-                            // Get name
-                            String name = document.select("div.top_container > h1").text();
-                            // Get subject + replace space with ","
-                            String subject = document.select("div.subject_tags_full > span.subject_tag").text();
-                            String[] subjectsArray = subject.split(" ");
-                            StringBuilder resultBuilder = new StringBuilder();
-                            resultBuilder.append(subjectsArray[0]);
+        Log.d("PARSE", "STARTED PARSING");
+        int firstOlympId = 50;
+        int lastOlympId = 120;
+        maxProgressLiveData.setValue(lastOlympId - firstOlympId + 1);
+        Log.d("PROGRESS", "MAX PROGRESS:" + (lastOlympId - firstOlympId + 1));
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = firstOlympId; i <= lastOlympId; i++) {
+                    try {
+                        // Loading html page
+                        Document document = Jsoup.connect("https://olimpiada.ru/activity/" + i).get();
+                        // Get name
+                        String name = document.select("div.top_container > h1").text();
+                        // Get subject + replace space with ","
+                        String subject = document.select("div.subject_tags_full > span.subject_tag").text();
+                        String[] subjectsArray = subject.split(" ");
+                        StringBuilder resultBuilder = new StringBuilder();
+                        resultBuilder.append(subjectsArray[0]);
 
-                            for (int j = 1; j < subjectsArray.length; j++) {
-                                if (Character.isLowerCase(subjectsArray[j].charAt(0))) {
-                                    resultBuilder.append(" ");
-                                } else {
-                                    resultBuilder.append(", ");
-                                }
-                                resultBuilder.append(subjectsArray[j]);
-                            }
-                            subject = resultBuilder.toString();
-                            // Get grade
-                            String grade = document.select("span.classes_types_a").text();
-                            // Transform range to numbers for search
-                            StringBuilder gradesList = new StringBuilder();
-                            if (grade.contains("–")) {
-                                int dashIndex = grade.indexOf("–");
-                                int start = Integer.parseInt(grade.substring(0, dashIndex));
-                                int end = Integer.parseInt(grade.substring(dashIndex + 1, grade.indexOf(' ', dashIndex)));
-                                for (int j = start; j <= end; j++) {
-                                    gradesList.append(j).append(" ");
-                                }
-                            } else if (!grade.isEmpty()) {
-                                gradesList = new StringBuilder(grade.substring(0, grade.indexOf(" ")));
+                        for (int j = 1; j < subjectsArray.length; j++) {
+                            if (Character.isLowerCase(subjectsArray[j].charAt(0))) {
+                                resultBuilder.append(" ");
                             } else {
-                                gradesList = new StringBuilder();
+                                resultBuilder.append(", ");
                             }
-                            // Get stages + dates
-                            Elements rows = document.select("table.events_for_activity tr.grey");
-                            StringBuilder stagesBuilder = new StringBuilder();
-                            StringBuilder datesBuilder = new StringBuilder();
-                            for (Element row : rows) {
-                                stagesBuilder.append(row.select("td:eq(0) div.event_name").text()).append(",");
-                                datesBuilder.append(row.select("td:eq(1) a").text()).append(",");
-                            }
-                            String stages = stagesBuilder.toString().replaceAll(",$", "");
-                            String dates = datesBuilder.toString().replaceAll(",$", "");
-                            // Get olympiad url
-                            String url = document.select("div.contacts > a.color").attr("href");
-                            // Get description
-                            String description = document.select("meta[name = description]").attr("content");
-                            // Get keywords
-                            String keywords = document.select("meta[name = keywords]").attr("content");
-                            // Creating olympiad + adding it to DB
-                            Olympiad olympiad = new Olympiad(i, name, subject, grade, stages, dates, url, description, keywords, gradesList.toString());
-
-                            Disposable disposable = database.olympiadDao().insertOlympiad(olympiad)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(new Action() {
-                                        @Override
-                                        public void run() throws Throwable {
-                                        }
-                                    });
-                            compositeDisposable.add(disposable);
-                            Log.d("PARSE", "PARSED SUCCESSFULLY " + "ID = " + olympiad.getId() + " NAME = " + olympiad.getName());
-                            refreshList();
-                        } catch (Exception e) {
-                            Log.d("PARSE", "PARSE ERROR: " + e.getMessage());
+                            resultBuilder.append(subjectsArray[j]);
                         }
-                        currentProgressLiveData.postValue(i - firstOlympId + 1);
-                        Log.d("PROGRESS", String.valueOf(i - firstOlympId + 1));
-                    }
+                        subject = resultBuilder.toString();
 
+                        // Get grade
+                        String grade = document.select("span.classes_types_a").text();
+                        // Transform range to numbers for search
+                        StringBuilder gradesList = new StringBuilder();
+                        if (grade.contains("–")) {
+                            int dashIndex = grade.indexOf("–");
+                            int start = Integer.parseInt(grade.substring(0, dashIndex));
+                            int end = Integer.parseInt(grade.substring(dashIndex + 1, grade.indexOf(' ', dashIndex)));
+                            for (int j = start; j <= end; j++) {
+                                gradesList.append(j).append(" ");
+                            }
+                        } else if (!grade.isEmpty()) {
+                            gradesList = new StringBuilder(grade.substring(0, grade.indexOf(" ")));
+                        } else {
+                            gradesList = new StringBuilder();
+                        }
+                        // Get stages + dates
+                        Elements rows = document.select("table.events_for_activity tr.grey");
+                        StringBuilder stagesBuilder = new StringBuilder();
+                        StringBuilder datesBuilder = new StringBuilder();
+                        for (Element row : rows) {
+                            stagesBuilder.append(row.select("td:eq(0) div.event_name").text()).append(",");
+                            datesBuilder.append(row.select("td:eq(1) a").text()).append(",");
+                        }
+                        String stages = stagesBuilder.toString().replaceAll(",$", "");
+                        String dates = datesBuilder.toString().replaceAll(",$", "");
+                        // Get olympiad url
+                        String url = document.select("div.contacts > a.color").attr("href");
+                        // Get description
+                        String description = document.select("meta[name = description]").attr("content");
+                        // Get keywords
+                        String keywords = document.select("meta[name = keywords]").attr("content");
+                        // Creating olympiad + adding it to DB
+                        Olympiad olympiad = new Olympiad(i,
+                                name,
+                                subject,
+                                grade,
+                                stages,
+                                dates,
+                                url,
+                                description,
+                                keywords,
+                                gradesList.toString(),
+                                isTech(subjectsArray),
+                                isNature(subjectsArray),
+                                isHuman(subjectsArray));
+
+                        Disposable disposable = database.olympiadDao().insertOlympiad(olympiad)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Action() {
+                                    @Override
+                                    public void run() throws Throwable {
+                                    }
+                                });
+                        compositeDisposable.add(disposable);
+                        Log.d("PARSE", "PARSED SUCCESSFULLY " + "ID = " + olympiad.getId() + " NAME = " + olympiad.getName());
+                        refreshList();
+                    } catch (Exception e) {
+                        Log.d("PARSE", "PARSE ERROR: " + e.getMessage());
+                    }
+                    currentProgressLiveData.postValue(i - firstOlympId + 1);
+                    Log.d("PROGRESS", String.valueOf(i - firstOlympId + 1));
                 }
-            });
-            thread.start();
-            isDataLoaded = true;
-        }
+                refreshList();
+            }
+        });
+        thread.start();
+        currentProgressLiveData.setValue(0);
     }
 
     // Methods for filtering
@@ -190,11 +212,11 @@ public class MainViewModel extends AndroidViewModel {
                 }
             }
         }
-        // Обновляем LiveData с отфильтрованным списком олимпиад
+        // updating LiveData with filtered list of olympiads
         filteredOlympiads.setValue(filteredList);
     }
 
-    private boolean containsAllGrades (String gradesList, List < Integer > selectedGrades){
+    private boolean containsAllGrades(String gradesList, List<Integer> selectedGrades) {
         // Splitting grades string to array
         String[] gradesArray = gradesList.split(" ");
         for (int grade : selectedGrades) {
@@ -211,6 +233,33 @@ public class MainViewModel extends AndroidViewModel {
             }
         }
         return true;
+    }
+
+    private boolean isTech(String[] subjectsArray) {
+        for (String subject : subjectsArray) {
+            if (tech.contains(subject)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isNature(String[] subjectsArray) {
+        for (String subject : subjectsArray) {
+            if (nature.contains(subject)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isHuman(String[] subjectsArray) {
+        for (String subject : subjectsArray) {
+            if (human.contains(subject)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*

@@ -19,4 +19,6 @@
     <string name="olympiada_ru">Страница на Olympiada.ru</string>
     <string name="search">Search</string>
     <string name="filter_icon">Filter Icon</string>
+    <string name="options_icon">Options icon</string>
+    <string name="updateData">Обновить данные</string>
 </resources>

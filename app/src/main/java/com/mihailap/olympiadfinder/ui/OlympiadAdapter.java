@@ -36,6 +36,21 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
         holder.binding.tvName.setText(olympiad.getName());
         holder.binding.tvSubject.setText(olympiad.getSubject());
         holder.binding.tvGrade.setText(olympiad.getGradeRange());
+        if (!olympiad.getTech()) {
+            holder.binding.techIcon.setVisibility(View.GONE);
+        } else {
+            holder.binding.techIcon.setVisibility(View.VISIBLE);
+        }
+        if (!olympiad.getNature()) {
+            holder.binding.natureIcon.setVisibility(View.GONE);
+        } else {
+            holder.binding.natureIcon.setVisibility(View.VISIBLE);
+        }
+        if (!olympiad.getHuman()) {
+            holder.binding.humanIcon.setVisibility(View.GONE);
+        } else {
+            holder.binding.humanIcon.setVisibility(View.VISIBLE);
+        }
 
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override

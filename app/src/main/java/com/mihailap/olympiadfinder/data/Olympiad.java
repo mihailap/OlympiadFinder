@@ -31,12 +31,31 @@ public class Olympiad implements Serializable {
     private String keywords;
     @ColumnInfo(name = "gradesList")
     private String gradesList;
+    @ColumnInfo(name = "isTech")
+    private Boolean isTech;
+    @ColumnInfo(name = "isNature")
+    private Boolean isNature;
+    @ColumnInfo(name = "isHuman")
+    private Boolean isHuman;
+
 
     @Ignore
     public Olympiad() {
     }
 
-    public Olympiad(int id, String name, String subject, String gradeRange, String stages, String dates, String url, String description, String keywords, String gradesList) {
+    public Olympiad(int id,
+                    String name,
+                    String subject,
+                    String gradeRange,
+                    String stages,
+                    String dates,
+                    String url,
+                    String description,
+                    String keywords,
+                    String gradesList,
+                    Boolean isTech,
+                    Boolean isNature,
+                    Boolean isHuman) {
         this.id = id;
         this.name = name;
         this.subject = subject;
@@ -47,6 +66,9 @@ public class Olympiad implements Serializable {
         this.description = description;
         this.keywords = keywords;
         this.gradesList = gradesList;
+        this.isTech = isTech;
+        this.isNature = isNature;
+        this.isHuman = isHuman;
     }
 
     // Getters
@@ -90,6 +112,18 @@ public class Olympiad implements Serializable {
         return gradesList;
     }
 
+    public Boolean getTech() {
+        return isTech;
+    }
+
+    public Boolean getNature() {
+        return isNature;
+    }
+
+    public Boolean getHuman() {
+        return isHuman;
+    }
+
     @Override
     public String toString() {
         return "Olympiad{" +
@@ -103,6 +137,9 @@ public class Olympiad implements Serializable {
                 ", description='" + description + '\'' +
                 ", keywords='" + keywords + '\'' +
                 ", gradesList='" + gradesList + '\'' +
+                ", isTech=" + isTech +
+                ", isNature=" + isNature +
+                ", isHuman=" + isHuman +
                 '}';
     }
 
@@ -111,12 +148,11 @@ public class Olympiad implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Olympiad olympiad = (Olympiad) o;
-        return id == olympiad.id && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(stages, olympiad.stages) && Objects.equals(dates, olympiad.dates) && Objects.equals(url, olympiad.url) && Objects.equals(description, olympiad.description) && Objects.equals(keywords, olympiad.keywords) && Objects.equals(gradesList, olympiad.gradesList);
+        return id == olympiad.id && Objects.equals(name, olympiad.name) && Objects.equals(subject, olympiad.subject) && Objects.equals(gradeRange, olympiad.gradeRange) && Objects.equals(stages, olympiad.stages) && Objects.equals(dates, olympiad.dates) && Objects.equals(url, olympiad.url) && Objects.equals(description, olympiad.description) && Objects.equals(keywords, olympiad.keywords) && Objects.equals(gradesList, olympiad.gradesList) && Objects.equals(isTech, olympiad.isTech) && Objects.equals(isNature, olympiad.isNature) && Objects.equals(isHuman, olympiad.isHuman);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, subject, gradeRange, stages, dates, url, description, keywords, gradesList);
+        return Objects.hash(id, name, subject, gradeRange, stages, dates, url, description, keywords, gradesList, isTech, isNature, isHuman);
     }
-
 }

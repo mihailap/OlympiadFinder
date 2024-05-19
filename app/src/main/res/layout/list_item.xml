@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardElevation="6dp"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="4dp"
+    app:cardElevation="6dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -37,16 +37,52 @@
 
         <TextView
             android:id="@+id/tv_grade"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:paddingBottom="4dp"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tech_icon"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_subject"
+            app:layout_constraintTop_toBottomOf="@id/tv_subject"
             tools:text="Grades" />
 
+        <ImageView
+            android:id="@+id/tech_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/options_icon"
+            android:src="@drawable/baseline_calculate_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/nature_icon"
+            app:layout_constraintTop_toBottomOf="@id/tv_subject" />
+
+        <ImageView
+            android:id="@+id/nature_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/options_icon"
+            android:src="@drawable/baseline_energy_savings_leaf_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/human_icon"
+            app:layout_constraintTop_toBottomOf="@id/tv_subject" />
+
+        <ImageView
+            android:id="@+id/human_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/options_icon"
+            android:src="@drawable/baseline_menu_book_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_subject" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

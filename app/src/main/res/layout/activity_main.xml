@@ -26,6 +26,7 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:progress="0"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/toolbar" />
@@ -37,6 +38,7 @@
         android:gravity="center"
         android:text="@string/loading_data"
         android:textSize="14sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/progress_bar"
@@ -46,7 +48,7 @@
         android:id="@+id/customSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_data_loading">
@@ -70,9 +72,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
             android:clickable="true"
             android:contentDescription="@string/filter_icon"
             android:src="@drawable/baseline_filter_list_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/options_icon"
+            app:layout_constraintTop_toTopOf="@id/customSearch" />
+
+        <ImageView
+            android:id="@+id/options_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:contentDescription="@string/options_icon"
+            android:src="@drawable/baseline_menu_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/customSearch"
             app:layout_constraintTop_toTopOf="@id/customSearch" />
@@ -103,10 +119,11 @@
             tools:text="Select grade" />
 
         <HorizontalScrollView
+            android:id="@+id/horizontal_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_select_grade">
 

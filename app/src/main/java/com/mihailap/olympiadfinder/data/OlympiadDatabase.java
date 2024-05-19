@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {Olympiad.class}, version = 2)
 public abstract class OlympiadDatabase extends RoomDatabase {
-    private static final String DB_NAME = "OlympiadDB2.db";
+    private static final String DB_NAME = "OlympiadDB3.db";
     private static OlympiadDatabase instance = null;
 
     public static OlympiadDatabase newInstance(Application application) {
