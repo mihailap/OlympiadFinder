@@ -207,19 +207,30 @@ public class MainActivity extends AppCompatActivity {
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("Обновление данных")
-                                .setMessage("Вы точно хотите обновить данные?")
-                                .setPositiveButton(string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        viewModel.parseOlympiads();
-                                        setProgressBar();
-                                        //Toast.makeText(getApplicationContext(), "ОБНОВЛЯЕМ ДАННЫЕ...", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .setNegativeButton(string.no, null)
-                                .show();
+                        int itemId = item.getItemId();
+
+                        if (itemId == R.id.favourites) {
+
+
+                            Intent intent = new Intent(MainActivity.this, FavouriteOlympiadActivity.class);
+                            startActivity(intent);
+                        } else if (itemId == R.id.update) {
+
+                            new AlertDialog.Builder(MainActivity.this)
+                                    .setTitle("Обновление данных")
+                                    .setMessage("Вы точно хотите обновить данные?")
+                                    .setPositiveButton(string.ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            viewModel.parseOlympiads();
+                                            setProgressBar();
+                                            //Toast.makeText(getApplicationContext(), "ОБНОВЛЯЕМ ДАННЫЕ...", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .setNegativeButton(string.no, null)
+                                    .show();
+
+                        }
                         return true;
                     }
                 });

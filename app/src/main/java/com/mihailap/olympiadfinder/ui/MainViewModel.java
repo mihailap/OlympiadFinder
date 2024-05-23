@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -110,8 +111,10 @@ public class MainViewModel extends AndroidViewModel {
                     try {
                         // Loading html page
                         Document document = Jsoup.connect("https://olimpiada.ru/activity/" + i).get();
+
                         // Get name
                         String name = document.select("div.top_container > h1").text();
+
                         // Get subject + replace space with ","
                         String subject = document.select("div.subject_tags_full > span.subject_tag").text();
                         String[] subjectsArray = subject.split(" ");
@@ -130,6 +133,7 @@ public class MainViewModel extends AndroidViewModel {
 
                         // Get grade
                         String grade = document.select("span.classes_types_a").text();
+
                         // Transform range to numbers for search
                         StringBuilder gradesList = new StringBuilder();
                         if (grade.contains("–")) {
@@ -144,6 +148,7 @@ public class MainViewModel extends AndroidViewModel {
                         } else {
                             gradesList = new StringBuilder();
                         }
+
                         // Get stages + dates
                         Elements rows = document.select("table.events_for_activity tr.grey");
                         StringBuilder stagesBuilder = new StringBuilder();
@@ -154,12 +159,24 @@ public class MainViewModel extends AndroidViewModel {
                         }
                         String stages = stagesBuilder.toString().replaceAll(",$", "");
                         String dates = datesBuilder.toString().replaceAll(",$", "");
+
                         // Get olympiad url
                         String url = document.select("div.contacts > a.color").attr("href");
+
                         // Get description
                         String description = document.select("meta[name = description]").attr("content");
+
                         // Get keywords
                         String keywords = document.select("meta[name = keywords]").attr("content");
+
+                        // Get icon
+                        //Element icon = document.select("div.fs.has-image img").first();
+                        //icon != null ? icon.attr("src") : "",
+
+                        // Get isFavourite
+                        Boolean isFavourite = database.olympiadDao().getFavouriteStatus(i);
+//                        Boolean isFavourite = false;
+
                         // Creating olympiad + adding it to DB
                         Olympiad olympiad = new Olympiad(i,
                                 name,
@@ -173,7 +190,11 @@ public class MainViewModel extends AndroidViewModel {
                                 gradesList.toString(),
                                 isTech(subjectsArray),
                                 isNature(subjectsArray),
-                                isHuman(subjectsArray));
+                                isHuman(subjectsArray),
+                                isSports(subjectsArray),
+                                isFavourite);
+
+
 
                         Disposable disposable = database.olympiadDao().insertOlympiad(olympiad)
                                 .subscribeOn(Schedulers.io())
@@ -206,7 +227,8 @@ public class MainViewModel extends AndroidViewModel {
         if (tempList != null) {
             for (Olympiad item : tempList) {
                 if ((item.getKeywords().toLowerCase().contains(text.toLowerCase())
-                        || item.getName().toLowerCase().contains(text.toLowerCase()))
+                        || item.getName().toLowerCase().contains(text.toLowerCase())
+                        || item.getSubject().toLowerCase().contains(text.toLowerCase()))
                         && containsAllGrades(item.getGradesList(), selectedGrades)) {
                     filteredList.add(item);
                 }
@@ -256,6 +278,15 @@ public class MainViewModel extends AndroidViewModel {
     private boolean isHuman(String[] subjectsArray) {
         for (String subject : subjectsArray) {
             if (human.contains(subject)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSports(String[] subjectsArray) {
+        for (String subject : subjectsArray) {
+            if (Objects.equals(subject, "культура")) {
                 return true;
             }
         }

@@ -34,7 +34,13 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
     public void onBindViewHolder(@NonNull OlympiadViewHolder holder, int position) {
         Olympiad olympiad = olympiadList.get(position);
         holder.binding.tvName.setText(olympiad.getName());
-        holder.binding.tvSubject.setText(olympiad.getSubject());
+        if (olympiad.getSubject().split(",").length > 4) {
+            String[] subjectsArray = olympiad.getSubject().split(",");
+            holder.binding.tvSubject.setText(String.format("%s, %s, %s, %s + еще %s", subjectsArray[0],
+                    subjectsArray[1], subjectsArray[2], subjectsArray[3], subjectsArray.length - 4));
+        } else {
+            holder.binding.tvSubject.setText(olympiad.getSubject());
+        }
         holder.binding.tvGrade.setText(olympiad.getGradeRange());
         if (!olympiad.getTech()) {
             holder.binding.techIcon.setVisibility(View.GONE);
@@ -50,6 +56,11 @@ public class OlympiadAdapter extends RecyclerView.Adapter<OlympiadAdapter.Olympi
             holder.binding.humanIcon.setVisibility(View.GONE);
         } else {
             holder.binding.humanIcon.setVisibility(View.VISIBLE);
+        }
+        if (!olympiad.getSports()) {
+            holder.binding.sportsIcon.setVisibility(View.GONE);
+        } else {
+            holder.binding.sportsIcon.setVisibility(View.VISIBLE);
         }
 
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {

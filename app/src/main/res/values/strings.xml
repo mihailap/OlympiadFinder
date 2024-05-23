@@ -21,4 +21,7 @@
     <string name="filter_icon">Filter Icon</string>
     <string name="options_icon">Options icon</string>
     <string name="updateData">Обновить данные</string>
+    <string name="olympiad_icon">Olympiad Icon</string>
+    <string name="fav">Избранное</string>
+    <string name="star">Star</string>
 </resources>

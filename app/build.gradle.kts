@@ -50,4 +50,6 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxjava:3.1.5")
     //Parse
     implementation("org.jsoup:jsoup:1.17.2")
+    //Picasso for images
+    //implementation("com.squareup.picasso:picasso:2.71828")
 }
